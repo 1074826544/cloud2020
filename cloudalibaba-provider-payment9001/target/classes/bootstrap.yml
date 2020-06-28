@@ -1,0 +1,43 @@
+server:
+  port: 9001
+
+
+spring:
+  application:
+    name: nacos-payment-provider
+  main:
+    allow-bean-definition-overriding: true # Spring Boot 2.1 需要设定
+  cloud:
+    nacos:
+      discovery: #nacos 服务注册与发现
+        server-addr: 180.76.98.167:8848
+        namespace: fcb29678-d4a0-4c2c-a585-83251916dd13
+        cluster-name: DEFAULT
+      config: #nacos 配置中心
+        server-addr: 180.76.98.167:8848 # 配置中心地址
+        file-extension: yaml
+        namespace: fcb29678-d4a0-4c2c-a585-83251916dd13 # 开发环境
+        group: CLOUD2020_ALIBABA_DEV_GROUP # xx业务组
+    sentinel: #sentinel 熔断降级 相当于Hystrix
+      transport:
+        dashboard: 180.76.98.167:8080 #配置Sentinel dashboard地址
+        port: 8719 #默认8719接口，加入被占用自动从8719开始依次+1扫描，直到找到未占用的端口
+      datasource:
+        ds1:
+          nacos:
+            server-addr: 180.76.98.167:8848 #注入的nacos
+            dataId: cloudalibaba-sentinel-service
+            groupId: DEFAULT_GROUP
+            data-type: json
+            rule-type: flow
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+feign:
+  sentinel:
+    enabled: true # 激活Sentinel对Feign的支持
